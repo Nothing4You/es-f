@@ -49,7 +49,7 @@
 	<!-- <a title="Mitgliedsname gfsdgfsdgsfd" -->
     <pattern name="Seller">
       <![CDATA[
-	  ~<a\s+title="Mitgliedsname\s+([^"]+)"~i => 1
+	  ~<a[^>]+title="Mitgliedsname:&nbsp;([^"]+)">~i => 1
 	  ~<a[^>]+http://myworld\.ebay\..*" title="(.+?)">~i => 1
       ~<a[^>]+http://myworld\.ebay\.[^/]+/ebaymotors/(.+?)/~i => 1
       ~<a[^>]+http://myworld\.ebay\.[^/]+/(.+?)/~i => 1
