@@ -37,12 +37,11 @@ class ebayParser_de extends ebayParser {
 
 	  # _dbg(date('r',$ts));
 
-	}
-	elseif (preg_match('~(\d{1,2})\.\s*([^\.\d\s]{3,4})\.?\s*(\d{1,4})\s*?:<[^<]+>*\s.*?(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
+    }
+    elseif (preg_match('~(\d{1,2})\.\s*([^\.\d\s]{3,4})\.?\s*(\d{1,4})\s*(?:<[^<]+>)*\s*(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
 		# new scheme when there are html tags in between date and time plus month represented by abreviated name string
-		$ts = mktime($ts[5],$ts[6],$ts[7],$months[$ts[2]],$ts[1],$ts[3]);
+    $ts = mktime($ts[4],$ts[5],$ts[6],$months[$ts[2]],$ts[1],$ts[3]);
 		$ts -= $offset * 60*60;
-		die(var_dump($ts));
 
 	  # _dbg(date('r',$ts));
 
