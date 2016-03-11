@@ -1,7 +1,6 @@
 <?php
 /**
  * Parser for ebay.de
-
  *
  * @ingroup    ebayParser
  * @author     Knut Kohl <knutkohl@users.sourceforge.net>
@@ -12,71 +11,65 @@
  */
 class ebayParser_de extends ebayParser {
 
-  /**
-   * Class constructor
-   */
-  public function __construct() {
-    parent::__construct('de');
-  }
-
-  /**
-   * Individually convert end time string to a timestamp
-   *
-   * @param string $dt Found string by reg. expression
-   */
-  public function getDetailEND( $dt ) {
-
-  $months = array( 'Jan' => 1, 'Feb' => 2, 'Mär' => 3, 'Apr' => 4, 'Mai' => 5, 'Jun' => 6, 'Jul' => 7, 'Aug' => 8, 'Sep' => 9, 'Okt' => 10, 'Nov' => 11, 'Dez' => 12 );
-
-  # _dbg($dt);
-
-    if (preg_match('~(\d{1,2})\.(\d{1,2})\.(\d{1,4})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
-		# old scheme when there are no html tags in between date and time plus month represented by a number
-		$ts = mktime($ts[4],$ts[5],$ts[6],$ts[2],$ts[1],$ts[3]);
-		$ts -= $offset * 60*60;
-
-	  # _dbg(date('r',$ts));
-
-    }
-    elseif (preg_match('~(\d{1,2})\.\s*([^\.\d\s]{3,4})\.?\s*(\d{1,4})\s*(?:<[^<]+>)*\s*(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
-		# new scheme when there are html tags in between date and time plus month represented by abreviated name string
-    $ts = mktime($ts[4],$ts[5],$ts[6],$months[$ts[2]],$ts[1],$ts[3]);
-		$ts -= $offset * 60*60;
-
-	  # _dbg(date('r',$ts));
-
-	}
-	elseif (preg_match('~(\d{1,2})\.\s*(\S{3,4})\.\s*(\d{1,4})\s*(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
-		# old scheme when there are no html tags in between date and time but month is represented by abreviated name string
-		$ts = mktime($ts[4],$ts[5],$ts[6],$months[$ts[2]],$ts[1],$ts[3]);
-		$ts -= $offset * 60*60;
-
-	  # _dbg(date('r',$ts));
-
-	}
-	else {
-		return FALSE;
-	}
-  # _dbg($ts);
-
-    // local and ebay time zone
-    $tz = array($this->Timezone, $ts[7]);
-
-  # _dbg($tz);
-
-    foreach ($tz as $t) {
-      if (!isset($this->TimeZones[$t])) {
-        trigger_error('Missing time zone definition: '.$t);
-        $this->TimeZones[$t] = 0;
-      }
+    /**
+     * Class constructor
+     */
+    public function __construct() {
+        parent::__construct('de');
     }
 
-    // offset between ebay.com used time and local time plus undocumented server offset
-    $offset = $this->TimeZones[$tz[1]] - $this->TimeZones[$tz[0]] - Registry::get('TZOFFSET');
+    /**
+     * Individually convert end time string to a timestamp
+     *
+     * @param string $dt Found string by reg. expression
+     */
+    public function getDetailEND( $dt ) {
 
-  # _dbg($this->TimeZones[$tz[1]].' - '.$this->TimeZones[$tz[0]]);
+        $months = array( 'Jan' => 1, 'Feb' => 2, 'Mär' => 3, 'Apr' => 4, 'Mai' => 5, 'Jun' => 6, 'Jul' => 7, 'Aug' => 8, 'Sep' => 9, 'Okt' => 10, 'Nov' => 11, 'Dez' => 12 );
 
-    return $ts;
-  }
+        # _dbg($dt);
+
+        if (preg_match('~(\d{1,2})\.(\d{1,2})\.(\d{1,4})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
+            # old scheme when there are no html tags in between date and time plus month represented by a number
+            $ts = mktime($ts[4],$ts[5],$ts[6],$ts[2],$ts[1],$ts[3]);
+            $ts -= $offset * 60*60;
+
+            # _dbg(date('r',$ts));
+        } elseif (preg_match('~(\d{1,2})\.\s*([^\.\d\s]{3,4})\.?\s*(\d{1,4})\s*(?:<[^<]+>)*\s*(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
+            # new scheme when there are html tags in between date and time plus month represented by abreviated name string
+            $ts = mktime($ts[4],$ts[5],$ts[6],$months[$ts[2]],$ts[1],$ts[3]);
+            $ts -= $offset * 60*60;
+
+            # _dbg(date('r',$ts));
+        } elseif (preg_match('~(\d{1,2})\.\s*(\S{3,4})\.\s*(\d{1,4})\s*(\d{1,2}):(\d{1,2}):(\d{1,2})\s*(\w{3,4})~', $dt, $ts)) {
+            # old scheme when there are no html tags in between date and time but month is represented by abreviated name string
+            $ts = mktime($ts[4],$ts[5],$ts[6],$months[$ts[2]],$ts[1],$ts[3]);
+            $ts -= $offset * 60*60;
+
+            # _dbg(date('r',$ts));
+        } else {
+            return FALSE;
+        }
+        # _dbg($ts);
+
+        // local and ebay time zone
+        $tz = array($this->Timezone, $ts[7]);
+
+        # _dbg($tz);
+
+        foreach ($tz as $t) {
+            if (!isset($this->TimeZones[$t])) {
+                trigger_error('Missing time zone definition: '.$t);
+                $this->TimeZones[$t] = 0;
+            }
+        }
+
+        // offset between ebay.com used time and local time plus undocumented server offset
+        $offset = $this->TimeZones[$tz[1]] - $this->TimeZones[$tz[0]] - Registry::get('TZOFFSET');
+
+        # _dbg($this->TimeZones[$tz[1]].' - '.$this->TimeZones[$tz[0]]);
+
+        return $ts;
+    }
 
 } // class
